@@ -35,11 +35,32 @@
       margin-top: 15px;
       width: 100%;
       form {
+        .confirm {
+          display: flex;
+          justify-content: center;
+          gap: 15px;
+          button {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            color: #fff;
+          }
+          .delete {
+            background: #e72727;
+          }
+          .cancel {
+            background: #342ee4;
+          }
+        }
         .item-form {
           display: flex;
           flex-direction: column;
+          text-align: left;
           gap: 5px;
           margin: 15px 0;
+          .tags {
+            cursor: pointer;
+          }
           input,
           textarea {
             padding: 10px;

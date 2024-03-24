@@ -1,6 +1,6 @@
 // import React from "react";
-import { FaRegTrashAlt } from "react-icons/fa";
-import { MdEdit } from "react-icons/md";
+
+import DeletePost from "../delete/DeletePost";
 
 import { useEffect, useState } from "react";
 import "../posts/posts.scss";
@@ -9,17 +9,16 @@ import Pagination from "../pagination/Pagination";
 import FilterForm from "../filterForm/FilterForm";
 import TagsForm from "../tagsForm/TagsForm";
 import AddPost from "../addPost/AddPost";
+import EditPost from "../editPost/editPost";
 export default function Posts() {
-  const [post, setPosts] = useState([
-    { description: 1, id: 2, tags: [1, 2, 3], title: 4 },
-    { description: 1, id: 2, tags: [1, 2, 3], title: 4 },
-    { description: 1, id: 2, tags: [1, 2, 3], title: 4 },
-    { description: 1, id: 2, tags: [1, 2, 3], title: 4 },
-    { description: 1, id: 2, tags: [1, 2, 3], title: 4 },
-    { description: 1, id: 2, tags: [1, 2, 3], title: 4 },
-    { description: 1, id: 2, tags: [1, 2, 3], title: 4 },
-  ]);
-  console.log(post);
+  const [addNew, setAddNew] = useState({
+    title: "",
+    description: "",
+    tags: [],
+  });
+  const [reload, setReload] = useState(false);
+  const [post, setPosts] = useState(null);
+  const [tags, setTags] = useState(null);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({});
   const [filter, setFilter] = useState({
@@ -27,6 +26,7 @@ export default function Posts() {
     page: 1,
     title: "",
   });
+
   useEffect(() => {
     const getPosts = async (filter) => {
       const posts = await dataApi.getPosts(filter);
@@ -35,8 +35,14 @@ export default function Posts() {
       delete posts.posts;
       setPagination({ ...posts });
     };
-    // getPosts(filter);
-  }, [filter]);
+    const getTags = async () => {
+      const tags = await dataApi.getTags();
+      console.log(tags);
+      setTags(tags);
+    };
+    getTags();
+    getPosts(filter);
+  }, [filter, reload]);
 
   const handlePageChange = (newPage) => {
     setFilter({ ...filter, page: newPage });
@@ -51,10 +57,16 @@ export default function Posts() {
   return (
     <div className="container">
       <div className="control">
-        <AddPost />
+        <AddPost
+          tags={tags}
+          addNew={addNew}
+          setAddNew={setAddNew}
+          setReload={setReload}
+          reload={reload}
+        />
         <div className="filter">
           <FilterForm onSubmit={handleFilter} />
-          <TagsForm onSubmit={handleTagsChange} />
+          <TagsForm onSubmit={handleTagsChange} tags={tags} />
         </div>
       </div>
       <table>
@@ -69,18 +81,26 @@ export default function Posts() {
         </thead>
         <tbody>
           {!loading &&
-            post.map(({ description, id, tags, title }, index) => (
+            post?.map(({ description, id, tags: tagsItem, title }, index) => (
               <tr key={index}>
                 <td data-label="Id">{id}</td>
                 <td data-label="Title">{title}</td>
                 <td data-label="Description">{description}</td>
-                <td data-label="Tags">{tags?.join(", ")}</td>
+                <td data-label="Tags">{tagsItem?.join(", ")}</td>
                 <td data-label="Actions">
                   <span>
-                    <FaRegTrashAlt size={15} />
+                    <DeletePost id={id} reload={reload} setReload={setReload} />
                   </span>
                   <span>
-                    <MdEdit size={15} />
+                    <EditPost
+                      description={description}
+                      id={id}
+                      tags={tags}
+                      tagsItem={tagsItem}
+                      title={title}
+                      setReload={setReload}
+                      reload={reload}
+                    />
                   </span>
                 </td>
               </tr>

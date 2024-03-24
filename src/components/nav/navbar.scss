@@ -16,6 +16,10 @@
       display: flex;
       justify-content: space-between;
       padding: 10px 15px;
+      .group-btn {
+        display: flex;
+        gap: 15px;
+      }
     }
   }
 }

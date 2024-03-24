@@ -3,11 +3,12 @@ import "../signIn/loginFrom.scss";
 import Button from "../Button";
 import { useState } from "react";
 import authApi from "../../api/authApi";
+import { useAuth } from "../AuthContext";
 
 export default function LoginFrom() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const { setIsLogin } = useAuth();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -22,6 +23,7 @@ export default function LoginFrom() {
         setError("Tên người dùng không tồn tại");
       } else {
         setLoading(false);
+        setIsLogin(true);
         window.location.href = "http://localhost:5173/profile";
       }
     }

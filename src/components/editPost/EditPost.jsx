@@ -1,47 +1,41 @@
-import React, { useState } from "react";
-import "../addPost/addPost.scss";
+import React, { useEffect, useState } from "react";
 import Button from "../Button";
+import { MdEdit } from "react-icons/md";
+import "../addPost/addPost.scss";
 import dataApi from "../../api/dataApi";
-export default function AddPost({
+
+export default function EditPost({
+  description,
+  id,
   tags,
-  addNew,
-  setAddNew,
+  title,
+  tagsItem,
   setReload,
   reload,
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const [edit, setEdit] = useState({ description, id, title, tags: tagsItem });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(addNew);
-    const addPost = await dataApi.addPost(addNew);
-    setIsOpen(false);
+    const update = await dataApi.updatePost(id, edit);
     setReload(!reload);
-    setAddNew({
-      title: "",
-      description: "",
-      tags: [],
-    });
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach((checkbox) => {
-      checkbox.checked = false;
-    });
   };
-
   const handleChange = (e) => {
     const value = e.target.value;
     const name = e.target.name;
 
     if (name == "tags") {
-      const updatedTags = [...addNew.tags];
+      const updatedTags = [...edit.tags];
       const index = updatedTags.indexOf(value);
       index === -1 ? updatedTags.push(value) : updatedTags.splice(index, 1);
-      setAddNew((prevState) => ({
+      setEdit((prevState) => ({
         ...prevState,
         [name]: updatedTags,
       }));
     } else {
-      setAddNew((prevState) => ({
+      setEdit((prevState) => ({
         ...prevState,
         [name]: value,
       }));
@@ -49,15 +43,13 @@ export default function AddPost({
   };
   return (
     <div>
-      <button
+      <span
         onClick={() => {
           setIsOpen(!isOpen);
         }}
-        className="btn-style"
       >
-        {" "}
-        Add new
-      </button>
+        <MdEdit size={15} />
+      </span>
       <div className={`overlay ${isOpen ? "show" : ""}`}>
         <div className="popup">
           <div className="wrap-title">
@@ -78,8 +70,8 @@ export default function AddPost({
                 <input
                   type="text"
                   name="title"
-                  value={addNew.title}
                   onChange={handleChange}
+                  value={edit.title}
                 />
               </div>
               <div className="item-form">
@@ -88,7 +80,7 @@ export default function AddPost({
                   type="text"
                   name="description"
                   onChange={handleChange}
-                  value={addNew.description}
+                  value={edit.description}
                 />
               </div>
               <div className="item-form ">
@@ -97,18 +89,19 @@ export default function AddPost({
                   {tags?.map((item, index) => (
                     <label htmlFor="" key={index} className="col-4">
                       <input
+                        onChange={handleChange}
                         className="tags"
                         type="checkbox"
                         name="tags"
                         value={item}
-                        onChange={handleChange}
+                        checked={edit.tags.includes(item)}
                       />{" "}
                       {item}
                     </label>
                   ))}
                 </div>
               </div>
-              <Button btnText={"Thêm mới"} />
+              <Button btnText={"Sửa"} />
             </form>
           </div>
         </div>
